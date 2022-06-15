@@ -34,8 +34,8 @@ const Persons = ({ persons, deletePerson }) => {
                                                     {person?.number}
                                                 </div>
                                             </td>
-                                            <td className="whitespace-nowrap px-3 py-4 text-sm text-center">
-                                                <input className="cursor-pointer" type="button" value="Delete" onClick={() => deletePerson(person.id, person.name)} />
+                                            <td className="whitespace-nowrap py-3 text-sm text-center ">
+                                                <input className="cursor-pointer text-red-600 font-semibold px-3 py-1 border border-transparent hover:bg-rose-200 hover:rounded-full hover:border-red-600" type="button" value="Delete" onClick={() => deletePerson(person.id, person.name)} />
                                             </td>
                                         </tr>
                                     )

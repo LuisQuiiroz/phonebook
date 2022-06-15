@@ -1,9 +1,6 @@
-import axios from 'axios';
 import { useEffect, useState } from 'react'
 import PlusIcon from '../public/icons/PlusIcon';
 import Alert from './Alert';
-import FilterPerson from './FilterPerson';
-import NavBar from './NavBar';
 import PersonForm from './PersonForm';
 import Persons from './Persons';
 import { createInDB, deletePersondDB, getAll, updatePersonDB } from './services';
@@ -16,6 +13,7 @@ function App() {
   const [newNumber, setNewNumber] = useState('');
   const [filterPerson, setFilterPerson] = useState([]);
   const [message, setMessage] = useState(initialMessage);
+  const [addPerson, setAddPerson] = useState(false);
 
 
   useEffect(() => {
@@ -80,6 +78,7 @@ function App() {
   const handleChangeSeaarch = e => setSearch(e.target.value)
   const handleChangeName = e => setNewName(e.target.value)
   const handleChangePhone = e => setNewNumber(e.target.value)
+  const handleChangeAdd = () => setAddPerson(!addPerson)
 
   const deletePerson = (id, name) => {
     if (window.confirm(`Delete ${name}`)) {
@@ -103,12 +102,11 @@ function App() {
 
   return (
     <div className="bg-stone-100">
-      <NavBar />
       {
         message.show && <Alert message={message} />
       }
       <div className="container mx-auto px-4">
-        {/* <div className="flex items-center justify-center">
+        <div className="flex items-center justify-center pt-5">
           <input
             className="form-control block w-full px-4 py-2 text-xl font-normal text-gray-700 bg-white bg-clip-padding border border-solid border-gray-300 rounded transition ease-in-out m-0 focus:text-gray-700  focus:bg-white focus:border-blue-600 focus:outline-none"
             autoFocus
@@ -117,34 +115,34 @@ function App() {
             onChange={handleChangeSeaarch}
             placeholder="Search"
           />
-          <button className=" m-2 p-2 rounded-full text-center border text-blue-600 ">
+          <button className=" m-2 p-2 rounded-full text-center border text-blue-600" title="Add contact" onClick={handleChangeAdd}>
             <PlusIcon />
           </button>
-          <Input
-            value={search}
-            onChange={handleChangeSeaarch}
-            placeholder="Search"
-          /> 
 
         </div>
-        <div>
-          <Persons
-            persons={filterPerson}
-            deletePerson={deletePerson}
-          />
-        </div> */}
-        <div>
-          <PersonForm
-            newName={newName}
-            newphone={newNumber}
-            handleSubmit={handleSubmit}
-            handleChangeName={handleChangeName}
-            handleChangePhone={handleChangePhone}
-          />
-        </div>
+        {
+          filterPerson.length > 0 &&
+          <div>
+            <Persons
+              persons={filterPerson}
+              deletePerson={deletePerson}
+            />
+          </div>
+        }
+        {
+          addPerson &&
+          <div>
+            <PersonForm
+              newName={newName}
+              newphone={newNumber}
+              handleSubmit={handleSubmit}
+              handleChangeName={handleChangeName}
+              handleChangePhone={handleChangePhone}
+            />
+          </div>
+        }
 
         <div>
-          <h2>Numbers:</h2>
           <Persons
             persons={persons}
             deletePerson={deletePerson}
