@@ -3,7 +3,7 @@ import PlusIcon from '../public/icons/PlusIcon';
 import Alert from './Alert';
 import PersonForm from './PersonForm';
 import Persons from './Persons';
-import { createInDB, deletePersondDB, getAll, updatePersonDB } from './services';
+import { createInDB, deletePersondDB, getAll, getPersonDB, updatePersonDB } from './services';
 
 function App() {
   const initialMessage = { msg: '', error: false, show: false }
@@ -36,30 +36,52 @@ function App() {
     setNewNumber(newNumber.trim())
 
     if (persons.some(person => person.name === newName)) {
-      if (window.confirm(`${newName} is already added to phonebook, replace the old number with  a new one?`)) {
-        const updatePerson = persons.find(person => person.name === newName)
-        const objUpdatePerson = { ...updatePerson, number: newNumber }
-        updatePersonDB(updatePerson.id, objUpdatePerson)
-          .then(response => {
-            setPersons(persons.map(person => person.id !== updatePerson.id ? person : response))
-            setNewName('')
-            setNewNumber('')
-            setMessage({
-              msg: `'${response.name}' was updated correctly`,
-              show: true,
-            })
-            setTimeout(() => {
-              setMessage(initialMessage)
-            }, 3000);
+      const updatePerson = persons.find(person => person.name === newName)
+      getPersonDB(updatePerson.id)
+        .then(() => {
+          if (window.confirm(`${newName} is already added to phonebook, replace the old number with  a new one?`)) {
+            const objUpdatePerson = { number: newNumber }
+            updatePersonDB(updatePerson.id, objUpdatePerson)
+              .then(response => {
+                setPersons(persons.map(person => person.id !== updatePerson.id ? person : response))
+                setNewName('')
+                setNewNumber('')
+                setMessage({
+                  msg: `'${response.name}' was updated correctly`,
+                  show: true,
+                })
+                setTimeout(() => {
+                  setMessage(initialMessage)
+                }, 3000);
+              })
+              .catch((error) => {
+                setMessage({
+                  msg: error.response.data.error,
+                  show: true,
+                  error: true
+                })
+                setTimeout(() => {
+                  setMessage(initialMessage)
+                }, 10000);
+              })
+          }
+        })
+        .catch((error) => {
+          setMessage({
+            msg: `Information of ${updatePerson.name} has already been removed from server`,
+            show: true,
+            error: true
           })
-      }
+          setTimeout(() => {
+            setMessage(initialMessage)
+          }, 10000);
+        })
     } else {
       const objPerson = {
         name: newName, number: newNumber
       }
       createInDB(objPerson)
         .then(response => {
-          console.log(response)
           setPersons(persons.concat(response))
           setNewName('')
           setNewNumber('')
@@ -72,7 +94,16 @@ function App() {
           }, 3000);
 
         })
-        .catch((error) => console.log(error))
+        .catch((error) => {
+          setMessage({
+            msg: error.response.data.error,
+            show: true,
+            error: true
+          })
+          setTimeout(() => {
+            setMessage(initialMessage)
+          }, 10000);
+        })
     }
   }
   const handleChangeSeaarch = e => setSearch(e.target.value)
